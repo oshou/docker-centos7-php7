@@ -1,6 +1,12 @@
 # Pull base image
 FROM centos:7
 
+# Locale
+RUN sed -i -e "s/LANG=\"en_US.UTF-8\"/LANG=\"ja_JP.UTF-8\"/g" /etc/locale.conf
+
+# Timezone
+RUN cp -p /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+
 # System update
 RUN yum -y update
 
@@ -10,9 +16,6 @@ RUN yum -y install \
         less \
         vim \
         curl \
-        wget \
-        zip \
-        unzip \
         net-tools
 
 # Install php & php-fpm
@@ -26,19 +29,23 @@ RUN yum install -y epel-release && \
         php-gd \
         php-xml \
         php-pdo \
+        apc \
         php-fpm
+
+# User
+RUN groupadd --gid 1000 www-data && useradd www-data --uid 1000 --gid 1000
 
 # Cache cleaning
 RUN yum clean all
 
-# php setting
-WORKDIR /var/www
-COPY info.php /var/www/html/
-EXPOSE 9000
+# PHP setting
+# COPY ./conf/php.ini /etc/php.ini
+# COPY ./data/info.php /var/www/html/
+# RUN mkdir -m 777 -p /run/php-fpm
+# RUN chmod -R 755 /var/www && chown -R www-data:www-data /var/www
 
-# user setting
-RUN groupadd www-data && useradd www-data -g www-data -u 1000
-RUN mkdir -m 777 -p /run/php-fpm
+# Listen port
+EXPOSE 9000
 
 # php-fpm startup
 CMD ["/usr/sbin/php-fpm","-D"]
