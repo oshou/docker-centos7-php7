@@ -18,19 +18,21 @@ RUN yum -y install \
         curl \
         net-tools
 
-# Install php & php-fpm
+# Install php & opcache
 RUN yum install -y epel-release && \
     rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm && \
-    yum install --enablerepo=remi -y \
+    yum install -y --enablerepo=remi-php70 \
         php \
         php-devel \
         php-mcrypt \
         php-mbstring \
+        php-fpm \
         php-gd \
-        php-xml \
+        php-mysql \
         php-pdo \
-        apc \
-        php-fpm
+        php-xml \
+        php-pecl-apcu.x86_64 \
+        php-pecl-zendopcache
 
 # User
 RUN groupadd --gid 1000 www-data && useradd www-data --uid 1000 --gid 1000
